@@ -1,0 +1,881 @@
+openapi: 3.0.3
+info:
+  title: Idea Collision Engine API
+  description: |
+    A creative productivity API that generates unexpected but relevant idea combinations to break out of familiar patterns.
+    
+    ## Features
+    - AI-powered collision generation
+    - User authentication and subscription management
+    - Rate limiting and usage tracking
+    - Premium domain access
+    - Real-time health monitoring
+    
+    ## Authentication
+    Most endpoints require a Bearer token obtained via the `/auth/login` endpoint.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@ideacollisionengine.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.ideacollisionengine.com
+    description: Production server
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Service health check
+      description: Returns the overall health status of the service and its dependencies
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Get user profile
+      description: Retrieve the authenticated user's profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Authentication
+      summary: Update user profile
+      description: Update the authenticated user's profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/collisions/generate:
+    post:
+      tags:
+        - Collisions
+      summary: Generate idea collision
+      description: |
+        Create a new idea collision based on user interests and preferences.
+        Rate limited to 10 requests per minute for free users.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollisionRequest'
+      responses:
+        '201':
+          description: Collision generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollisionResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '402':
+          description: Usage limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          headers:
+            X-RateLimit-Limit:
+              description: Maximum requests per window
+              schema:
+                type: integer
+            X-RateLimit-Remaining:
+              description: Remaining requests in current window
+              schema:
+                type: integer
+            X-RateLimit-Reset:
+              description: Time when rate limit resets (Unix timestamp)
+              schema:
+                type: integer
+
+  /api/collisions/history:
+    get:
+      tags:
+        - Collisions
+      summary: Get collision history
+      description: Retrieve the user's collision generation history
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number (default 1)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Items per page (default 20, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Collision history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollisionHistoryResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/collisions/{id}/rate:
+    put:
+      tags:
+        - Collisions
+      summary: Rate a collision
+      description: Provide feedback on a generated collision
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Collision ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateCollisionRequest'
+      responses:
+        '200':
+          description: Collision rated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollisionResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Collision not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/collisions/usage:
+    get:
+      tags:
+        - Collisions
+      summary: Get usage status
+      description: Check current usage limits and remaining quota
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usage status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageStatusResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/collisions/health:
+    get:
+      tags:
+        - Collisions
+      summary: Collision service health
+      description: Check the health of the collision generation service
+      responses:
+        '200':
+          description: Collision service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollisionHealthResponse'
+        '503':
+          description: Collision service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollisionHealthResponse'
+
+  /api/domains/basic:
+    get:
+      tags:
+        - Domains
+      summary: Get basic domains
+      description: Retrieve available collision domains for basic tier users
+      responses:
+        '200':
+          description: Basic domains retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainsResponse'
+
+  /api/domains/premium:
+    get:
+      tags:
+        - Domains
+      summary: Get premium domains
+      description: Retrieve additional collision domains for premium users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Premium domains retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Premium subscription required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/subscriptions/plans:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get pricing plans
+      description: Retrieve available subscription plans and pricing
+      responses:
+        '200':
+          description: Pricing plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricingPlansResponse'
+
+  /api/subscriptions/checkout:
+    post:
+      tags:
+        - Subscriptions
+      summary: Create checkout session
+      description: Create a Stripe checkout session for subscription upgrade
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '200':
+          description: Checkout session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/subscriptions/status:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get subscription status
+      description: Check the user's current subscription status
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Subscription status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionStatusResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/subscriptions/cancel:
+    post:
+      tags:
+        - Subscriptions
+      summary: Cancel subscription
+      description: Cancel the user's active subscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Subscription cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionStatusResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No active subscription found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/subscriptions/webhook:
+    post:
+      tags:
+        - Subscriptions
+      summary: Stripe webhook handler
+      description: Handle Stripe webhook events for subscription management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          description: Invalid webhook payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        service:
+          type: string
+          example: "idea-collision-engine-api"
+        version:
+          type: string
+          example: "1.0.0"
+        timestamp:
+          type: string
+          format: date-time
+        database:
+          type: string
+          enum: [connected, unavailable]
+        cache:
+          type: string
+          enum: [connected, unavailable]
+        ai_service:
+          type: string
+          enum: [connected, unavailable]
+        collision_engine:
+          type: string
+          enum: [ready, uninitialized]
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - code
+      properties:
+        error:
+          type: string
+          description: Error type identifier
+        message:
+          type: string
+          description: Human-readable error message
+        code:
+          type: integer
+          description: HTTP status code
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          minLength: 8
+          example: "securepassword123"
+        name:
+          type: string
+          minLength: 1
+          example: "John Doe"
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          example: "securepassword123"
+
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        refresh_token:
+          type: string
+          description: JWT refresh token
+        expires_in:
+          type: integer
+          description: Token expiration time in seconds
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        subscription_tier:
+          type: string
+          enum: [free, pro, team]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+
+    CollisionRequest:
+      type: object
+      required:
+        - interests
+        - intensity
+      properties:
+        interests:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 5
+          example: ["technology", "art", "sustainability"]
+        intensity:
+          type: string
+          enum: [gentle, moderate, bold, extreme]
+          example: "moderate"
+        context:
+          type: string
+          maxLength: 500
+          example: "Looking for startup ideas in the creative space"
+
+    CollisionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        primary_domain:
+          $ref: '#/components/schemas/CollisionDomain'
+        secondary_domain:
+          $ref: '#/components/schemas/CollisionDomain'
+        connection:
+          type: string
+          description: AI-generated connection explanation
+        quality_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        novelty_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        relevance_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    CollisionDomain:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        tier:
+          type: string
+          enum: [basic, premium]
+        category:
+          type: string
+        intensity_compatibility:
+          type: array
+          items:
+            type: string
+            enum: [gentle, moderate, bold, extreme]
+
+    CollisionHistoryResponse:
+      type: object
+      properties:
+        collisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CollisionResponse'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+
+    RateCollisionRequest:
+      type: object
+      required:
+        - rating
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        feedback:
+          type: string
+          maxLength: 1000
+
+    UsageStatusResponse:
+      type: object
+      properties:
+        tier:
+          type: string
+          enum: [free, pro, team]
+        collision_count:
+          type: integer
+          description: Collisions used this week
+        collision_limit:
+          type: integer
+          description: Weekly collision limit (0 for unlimited)
+        reset_date:
+          type: string
+          format: date-time
+          description: When usage resets
+
+    CollisionHealthResponse:
+      type: object
+      properties:
+        service:
+          type: string
+          example: "collision-engine"
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        database:
+          type: string
+          enum: [connected, unavailable]
+        cache:
+          type: string
+          enum: [connected, unavailable]
+        ai_service:
+          type: string
+          enum: [connected, unavailable]
+        collision_engine:
+          type: string
+          enum: [ready, uninitialized]
+
+    DomainsResponse:
+      type: object
+      properties:
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/CollisionDomain'
+
+    PricingPlansResponse:
+      type: object
+      properties:
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/PricingPlan'
+
+    PricingPlan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        interval:
+          type: string
+          enum: [month, year]
+        features:
+          type: array
+          items:
+            type: string
+
+    CheckoutRequest:
+      type: object
+      required:
+        - plan_id
+      properties:
+        plan_id:
+          type: string
+        success_url:
+          type: string
+          format: uri
+        cancel_url:
+          type: string
+          format: uri
+
+    CheckoutResponse:
+      type: object
+      properties:
+        checkout_url:
+          type: string
+          format: uri
+        session_id:
+          type: string
+
+    SubscriptionStatusResponse:
+      type: object
+      properties:
+        tier:
+          type: string
+          enum: [free, pro, team]
+        status:
+          type: string
+          enum: [active, cancelled, past_due, unpaid]
+        current_period_start:
+          type: string
+          format: date-time
+          nullable: true
+        current_period_end:
+          type: string
+          format: date-time
+          nullable: true
+        cancel_at_period_end:
+          type: boolean
