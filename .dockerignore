@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+ARCHITECTURE.md
+PHASES.md
+DEPLOYMENT_READY.md
+TESTING_COMPLETE.md
+PROJECT_STATUS.md
+
+# Node modules and build artifacts
+node_modules
+dist
+.vite
+.cache
+
+# Go build artifacts
+main
+migrate
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+test_runner.go
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# Dependency directories
+vendor/
