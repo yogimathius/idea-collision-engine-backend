@@ -35,6 +35,10 @@ Break out of familiar patterns with unexpected but relevant idea combinations
 - Estimated operational coverage: **54%**
 - Confidence level: **medium**
 
+## Public Repository Notes
+- Runtime configuration should be copied from `backend/.env.example` into an untracked local `.env` file.
+- This repository should not store live secrets in version-controlled files.
+
 ## Future Work
 - Consolidate and document endpoint contracts with examples and expected payloads
 - Run the detected tests in CI and track flakiness, duration, and coverage
