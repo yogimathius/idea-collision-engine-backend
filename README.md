@@ -65,3 +65,23 @@ npm run dev
 ---
 
 *Intentional cognitive disruption as a creative service.*
+
+## Current Status
+
+- Frontend MVP with local storage and template-based generation.
+- No backend/API implementation documented in this repo.
+- Operational estimate: **45%** (MVP UI, limited intelligence).
+
+## API Endpoints
+
+- None. Frontend-only MVP.
+
+## Tests
+
+- No test suite detected.
+
+## Future Work
+
+- Add OpenAI integration and backend persistence.
+- Expand domain knowledge base.
+- Add tests and analytics for outcome quality.
