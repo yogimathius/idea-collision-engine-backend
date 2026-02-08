@@ -1,87 +1,41 @@
 # Idea Collision Engine 💥
 
-Break out of familiar patterns with unexpected but relevant idea combinations.
+Break out of familiar patterns with unexpected but relevant idea combinations
 
-## What is this?
+## Scope and Direction
+- Project path: `backend-services/idea-collision-engine`
+- Primary tech profile: Go, Node.js/TypeScript or JavaScript
+- Audit date: `2026-02-08`
 
-The Idea Collision Engine generates intentional cognitive disruptions by combining your interests and projects with unexpected domains like biomimicry, ancient civilizations, quantum physics, or martial arts. It's designed to spark genuinely novel directions when you're stuck in creative ruts.
-
-## Features
-
-- **Smart Collision Generation**: AI-powered connections between your project and unexpected domains
-- **Quality-Focused**: Curated collision domains with relevance scoring
-- **Exploration Tools**: Spark questions, examples, and actionable next steps
-- **History Tracking**: Remember and build on your best collisions
-- **Intensity Control**: From gentle connections to radical mind-bending leaps
-
-## How to Use
-
-1. **Enter your interests** (productivity, design, javascript, etc.)
-2. **Describe your current project** (what you're working on)
-3. **Choose project type** (product, content, business, research)
-4. **Select intensity** (gentle, moderate, or radical)
-5. **Generate collision** and explore the unexpected connections!
-
-## MVP Status
-
-This is an ultra-minimal MVP focused on validating the core collision concept:
-
-- ✅ Core collision generation with 15 curated domains
-- ✅ Template-based connection generation (no OpenAI API yet)
-- ✅ Local storage for collision history
-- ✅ Rating and notes system
-- ✅ Responsive design with smooth animations
-
-## Next Steps (Post-MVP)
-
-- [ ] OpenAI integration for dynamic connection generation
-- [ ] User accounts and cloud storage
-- [ ] Expanded domain database (200+ domains)
-- [ ] Pattern recognition and personalization
-- [ ] Team collaboration features
-- [ ] Freemium model implementation
-
-## Tech Stack
-
-- **Frontend**: React + TypeScript + Tailwind CSS
-- **Build**: Vite
-- **Storage**: localStorage (MVP only)
-- **Deploy**: Vercel
-
-## Development
-
-```bash
-npm install
-npm run dev
-```
-
-## Success Metrics (MVP)
-
-- Users generate 3+ collisions per session
-- 80%+ find collisions "unexpectedly relevant"
-- Users share results or return within 24 hours
-- Zero technical barriers to usage
-
----
-
-*Intentional cognitive disruption as a creative service.*
-
-## Current Status
-
-- Frontend MVP with local storage and template-based generation.
-- No backend/API implementation documented in this repo.
-- Operational estimate: **45%** (MVP UI, limited intelligence).
+## What Appears Implemented
+- Detected major components: `backend/`, `src/`
+- Source files contain API/controller routing signals
+- Root `package.json` defines development/build automation scripts
+- Go module metadata is present for one or more components
 
 ## API Endpoints
+- Direct route strings detected:
+- `/health`
+- `/collisions/generate`
+- `/collisions/history`
+- `/collisions/:id/rate`
+- `/collisions/usage`
+- `/collisions/health`
+- `/domains/basic`
 
-- None. Frontend-only MVP.
+## Testing Status
+- `test` script available in root `package.json`
+- `test:ui` script available in root `package.json`
+- `test:run` script available in root `package.json`
+- `test:coverage` script available in root `package.json`
+- `go test ./...` appears applicable for Go components
+- This audit did not assume tests are passing unless explicitly re-run and captured in this session
 
-## Tests
-
-- No test suite detected.
+## Operational Assessment
+- Estimated operational coverage: **54%**
+- Confidence level: **medium**
 
 ## Future Work
-
-- Add OpenAI integration and backend persistence.
-- Expand domain knowledge base.
-- Add tests and analytics for outcome quality.
+- Consolidate and document endpoint contracts with examples and expected payloads
+- Run the detected tests in CI and track flakiness, duration, and coverage
+- Validate runtime claims in this README against current behavior and deployment configuration
